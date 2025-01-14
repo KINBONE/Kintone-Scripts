@@ -1,123 +1,23 @@
-/* General Page Styling */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f9f9f9;
-    color: #333;
-    margin: 0;
-    padding: 0;
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-/* Table Container Styling */
-#scaffold-container {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border: 2px solid #cc0000; /* Red border */
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
 }
 
-/* Table Styling */
-#scaffold-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
 }
 
-#scaffold-table thead {
-    background-color: #cc0000; /* Red header background */
-    color: #fff;
+tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
-#scaffold-table th {
-    padding: 15px;
-    text-align: left;
-    font-size: 16px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 2px solid #990000; /* Slightly darker red border */
-}
-
-#scaffold-table td {
-    padding: 15px;
-    text-align: left;
-    font-size: 14px;
-    border-bottom: 1px solid #ddd;
-}
-
-#scaffold-table tr:hover {
-    background-color: #ffe5e5; /* Subtle red hover effect */
-}
-
-/* Button Styling */
-button {
-    display: inline-block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    background-color: #cc0000; /* Red button background */
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #990000; /* Darker red for hover */
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    #scaffold-container {
-        padding: 10px;
-    }
-
-    #scaffold-table th, #scaffold-table td {
-        padding: 10px;
-        font-size: 12px;
-    }
-
-    button {
-        width: 100%;
-        font-size: 12px;
-    }
-}
-
-/* Section Headers */
-h1 {
-    text-align: center;
-    color: #cc0000; /* Red accent for headings */
-    font-size: 28px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* Links */
-a {
-    color: #cc0000; /* Red links */
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: #990000; /* Darker red for hover */
-}
-
-/* Scrollbar Styling (Optional) */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #cc0000; /* Red scrollbar */
-    border-radius: 8px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background-color: #990000; /* Darker red scrollbar on hover */
+tr:hover {
+  background-color: #f1f1f1;
 }
