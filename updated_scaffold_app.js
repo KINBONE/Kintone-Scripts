@@ -1,42 +1,60 @@
-// Kintone App Configuration
-const appId = kintone.app.getId();
-const apiToken = 'your-api-token-here'; // Replace with your Kintone API token
-
-// Run script after Kintone loads
 (function () {
     'use strict';
 
+    // Run this script only on the "Display" view
     kintone.events.on('app.record.index.show', function (event) {
-        // Only run this on the "Display" view
         if (kintone.app.getViewName() !== 'Display') {
             return;
         }
 
-        // Create the dropdown and image elements
+        // Avoid duplicate elements
+        if (document.getElementById('scaffold-container')) {
+            return;
+        }
+
+        // Create container for UI
         const container = document.createElement('div');
+        container.id = 'scaffold-container';
+        container.style.margin = '20px';
+        container.style.textAlign = 'center';
+
+        // Create dropdown
         const dropdown = document.createElement('select');
         dropdown.id = 'scaffold-dropdown';
-        dropdown.innerHTML = '<option>- - Select Dimensions - -</option>';
+        dropdown.style.marginBottom = '20px';
+        dropdown.style.padding = '10px';
+        dropdown.style.fontSize = '16px';
+        dropdown.innerHTML = '<option value="">- - Select Dimensions - -</option>';
 
+        // Create image display
         const image = document.createElement('img');
         image.id = 'scaffold-image';
+        image.style.display = 'none'; // Hidden by default
+        image.style.maxWidth = '80%';
+        image.style.border = '2px solid #ccc';
+        image.style.borderRadius = '8px';
+        image.style.marginTop = '20px';
 
-        // Append to container
+        // Append elements to the container
         container.appendChild(dropdown);
         container.appendChild(image);
+
+        // Inject container into Kintone header menu space
         kintone.app.getHeaderMenuSpaceElement().appendChild(container);
 
-        // Fetch records from Kintone
-        fetch(`https://${location.hostname}/k/v1/records.json?app=${appId}`, {
+        // Fetch records from Kintone and populate dropdown
+        fetch(`https://${location.hostname}/k/v1/records.json?app=${kintone.app.getId()}`, {
             method: 'GET',
             headers: {
-                'X-Cybozu-API-Token': apiToken,
+                'X-Cybozu-API-Token': 'your-api-token-here', // Replace with your actual API token
                 'Content-Type': 'application/json'
             }
         })
             .then((response) => response.json())
             .then((data) => {
                 const records = data.records;
+
+                // Populate dropdown with dimensions
                 records.forEach((record) => {
                     const option = document.createElement('option');
                     option.value = record['Record number'].value;
@@ -47,18 +65,22 @@ const apiToken = 'your-api-token-here'; // Replace with your Kintone API token
                 // Update image on dropdown change
                 dropdown.addEventListener('change', () => {
                     const selectedRecord = records.find(
-                        (r) => r['Record number'].value === dropdown.value
+                        (record) => record['Record number'].value === dropdown.value
                     );
 
-                    if (selectedRecord) {
+                    if (selectedRecord && selectedRecord['Scaffold Model'].value) {
                         image.src = selectedRecord['Scaffold Model'].value;
-                        image.alt = `Image for ${selectedRecord['Scaffold Dimensions'].value}`;
+                        image.alt = `Scaffold Model for ${selectedRecord['Scaffold Dimensions'].value}`;
+                        image.style.display = 'block';
                     } else {
                         image.src = '';
                         image.alt = '';
+                        image.style.display = 'none';
                     }
                 });
             })
-            .catch((err) => console.error('Failed to fetch records:', err));
+            .catch((error) => {
+                console.error('Error fetching Kintone records:', error);
+            });
     });
 })();
