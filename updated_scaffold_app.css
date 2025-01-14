@@ -1,0 +1,74 @@
+
+/* General styles */
+#custom-view {
+    font-family: Arial, sans-serif;
+    margin: 10px;
+}
+
+#dimension-filter {
+    padding: 8px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#scaffold-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Scaffold card styling */
+.scaffold-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+/* Image styling */
+.model-image, .material-image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Media queries for mobile optimization */
+@media (max-width: 768px) {
+    #scaffold-display {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .scaffold-card {
+        width: 90%;
+    }
+
+    #dimension-filter {
+        width: 100%;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    #custom-view {
+        margin: 5px;
+    }
+
+    .scaffold-card {
+        padding: 8px;
+    }
+
+    #dimension-filter {
+        font-size: 14px;
+    }
+}
