@@ -4,7 +4,7 @@
 
   // Constants for app and custom view
   var APP_ID = 4; // Your Kintone App ID
-  var CUSTOM_VIEW_ID = 20; // Your Custom View ID
+  var CUSTOM_VIEW_ID = 9311; // Your Custom View ID
 
   var client = new KintoneRestAPIClient({}); // Initialize Kintone REST API Client
 
