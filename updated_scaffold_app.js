@@ -1,6 +1,9 @@
 (function() {
     'use strict';
 
+    // API Token
+    const apiToken = 'd1RlQonxULsmOdYCB3DRAx1gj4bPfxHw30furtZd';
+
     // Event: App Record List Page Loaded
     kintone.events.on('app.record.index.show', function(event) {
         // Only apply this customization to the "Display" view
@@ -28,7 +31,7 @@
             app: kintone.app.getId(),
             fields: ['Scaffold Dimensions'],
             query: ''
-        }).then(function(resp) {
+        }, { headers: { 'X-Cybozu-API-Token': apiToken } }).then(function(resp) {
             const uniqueDimensions = new Set();
             resp.records.forEach(record => {
                 if (record['Scaffold Dimensions'].value) {
@@ -56,28 +59,32 @@
             kintone.api(kintone.api.url('/k/v1/records', true), 'GET', {
                 app: kintone.app.getId(),
                 query: `Scaffold Dimensions = "${selectedDimension}"`
-            }).then(function(resp) {
+            }, { headers: { 'X-Cybozu-API-Token': apiToken } }).then(function(resp) {
                 resp.records.forEach(record => {
                     const card = document.createElement('div');
                     card.className = 'scaffold-card';
 
-                    // Populate card details
-                    card.innerHTML = `
-                        <h3>${record['Scaffold Dimensions'].value}</h3>
-                        <p><strong>Length:</strong> ${record['Length (ft)'].value} ft</p>
-                        <p><strong>Width:</strong> ${record['Width (ft)'].value} ft</p>
-                        <p><strong>Height:</strong> ${record['Height (ft)'].value} ft</p>
-                        <p><strong>Decks:</strong> ${record['number of Decks'].value}</p>
-                        <p><strong>Crew Size:</strong> ${record['Crew Size'].value}</p>
-                        <p><strong>Man Hours:</strong> ${record['Man Hours'].value}</p>
-                        <img class="model-image" src="${record['Scaffold Model'].value}" alt="Scaffold Model">
-                        <img class="material-image" src="${record['Material List'].value}" alt="Material List">
-                    `;
+                    // Scaffold Model
+                    const model = document.createElement('h3');
+                    model.textContent = record['Scaffold Model'].value;
+                    card.appendChild(model);
+
+                    // Material List Image
+                    const materialImage = document.createElement('img');
+                    materialImage.src = record['Material List'].value;
+                    materialImage.alt = 'Material List';
+                    materialImage.className = 'scaffold-image';
+                    card.appendChild(materialImage);
+
+                    // Man Hours and Crew Size
+                    const info = document.createElement('p');
+                    info.textContent = `Man Hours: ${record['Man Hours'].value}, Crew Size: ${record['Crew Size'].value}`;
+                    card.appendChild(info);
 
                     scaffoldDisplay.appendChild(card);
                 });
             }).catch(function(err) {
-                console.error('Error fetching filtered records:', err);
+                console.error('Error fetching records:', err);
             });
         });
     });
