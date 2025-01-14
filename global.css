@@ -1,0 +1,99 @@
+/* General Theme Colors */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5fa; /* Light background for contrast */
+    color: #333;
+}
+
+/* Purple and Gold Theme */
+header, .gaia-header, .gaia-nav {
+    background-color: #5a2d82; /* Purple */
+    color: #fbc02d; /* Gold */
+}
+
+button, input[type="button"], input[type="submit"] {
+    background-color: #5a2d82;
+    color: #fbc02d;
+    border: none;
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+    background-color: #fbc02d;
+    color: #5a2d82;
+}
+
+/* Record Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    text-align: left;
+    padding: 8px;
+}
+
+table th {
+    background-color: #5a2d82;
+    color: white;
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Scaffold Images and Material Lists */
+#scaffold-image-container img {
+    max-width: 90%;
+    border-radius: 10px;
+    border: 2px solid #5a2d82;
+    margin-top: 20px;
+}
+
+#material-list-container {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+#material-list li {
+    margin: 5px 0;
+}
+
+/* Form Enhancements */
+input, select, textarea {
+    border: 2px solid #5a2d82;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #fbc02d;
+    outline: none;
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+    table {
+        font-size: 12px;
+    }
+
+    header {
+        font-size: 16px;
+    }
+
+    #scaffold-image-container img {
+        max-width: 100%;
+    }
+}
