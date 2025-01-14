@@ -1,73 +1,50 @@
 (function () {
     'use strict';
 
-    // Run this script only on the "Display" view
+    // Event: Runs only on the "Display" view
     kintone.events.on('app.record.index.show', function (event) {
+        // Ensure we are on the "Display" view
         if (kintone.app.getViewName() !== 'Display') {
             return;
         }
 
-        // Avoid duplicate elements
-        if (document.getElementById('scaffold-container')) {
-            return;
-        }
+        // Select elements from the Custom View HTML
+        const dropdown = document.getElementById('scaffold-dropdown');
+        const image = document.getElementById('scaffold-image');
+        const materialList = document.getElementById('material-list');
 
-        // Create container for UI
-        const container = document.createElement('div');
-        container.id = 'scaffold-container';
-        container.style.margin = '20px';
-        container.style.textAlign = 'center';
-
-        // Create dropdown
-        const dropdown = document.createElement('select');
-        dropdown.id = 'scaffold-dropdown';
-        dropdown.style.marginBottom = '20px';
-        dropdown.style.padding = '10px';
-        dropdown.style.fontSize = '16px';
-        dropdown.innerHTML = '<option value="">- - Select Dimensions - -</option>';
-
-        // Create image display
-        const image = document.createElement('img');
-        image.id = 'scaffold-image';
-        image.style.display = 'none'; // Hidden by default
-        image.style.maxWidth = '80%';
-        image.style.border = '2px solid #ccc';
-        image.style.borderRadius = '8px';
-        image.style.marginTop = '20px';
-
-        // Append elements to the container
-        container.appendChild(dropdown);
-        container.appendChild(image);
-
-        // Inject container into Kintone header menu space
-        kintone.app.getHeaderMenuSpaceElement().appendChild(container);
-
-        // Fetch records from Kintone and populate dropdown
-        fetch(`https://${location.hostname}/k/v1/records.json?app=${kintone.app.getId()}`, {
+        // Fetch records from Kintone
+        fetch('https://g6dtxg679agk.kintone.com/k/v1/records.json?app=4', {
             method: 'GET',
             headers: {
-                'X-Cybozu-API-Token': 'your-api-token-here', // Replace with your actual API token
-                'Content-Type': 'application/json'
-            }
+                'X-Cybozu-API-Token': 'd1RlQonxULsmOdYCB3DRAx1gj4bPfxHw30furtZd',
+                'Content-Type': 'application/json',
+            },
         })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
             .then((data) => {
                 const records = data.records;
 
-                // Populate dropdown with dimensions
+                // Populate dropdown with scaffold dimensions
                 records.forEach((record) => {
                     const option = document.createElement('option');
-                    option.value = record['Record number'].value;
+                    option.value = record['Record number'].value; // Use record number as the key
                     option.textContent = record['Scaffold Dimensions'].value;
                     dropdown.appendChild(option);
                 });
 
-                // Update image on dropdown change
+                // Event: On dropdown change, update image and material list
                 dropdown.addEventListener('change', () => {
                     const selectedRecord = records.find(
                         (record) => record['Record number'].value === dropdown.value
                     );
 
+                    // Update image
                     if (selectedRecord && selectedRecord['Scaffold Model'].value) {
                         image.src = selectedRecord['Scaffold Model'].value;
                         image.alt = `Scaffold Model for ${selectedRecord['Scaffold Dimensions'].value}`;
@@ -76,6 +53,17 @@
                         image.src = '';
                         image.alt = '';
                         image.style.display = 'none';
+                    }
+
+                    // Update material list
+                    materialList.innerHTML = '';
+                    if (selectedRecord && selectedRecord['Material List'].value) {
+                        const materials = selectedRecord['Material List'].value.split('\n');
+                        materials.forEach((material) => {
+                            const li = document.createElement('li');
+                            li.textContent = material;
+                            materialList.appendChild(li);
+                        });
                     }
                 });
             })
