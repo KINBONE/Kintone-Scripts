@@ -1,115 +1,110 @@
-/* eslint-disable vars-on-top */
 (function () {
   'use strict';
 
-  // Constants for app and custom view
-  var APP_ID = 4; // Your Kintone App ID
-  var CUSTOM_VIEW_ID = 20; // Your Custom View ID
-
-  var client = new KintoneRestAPIClient({}); // Initialize Kintone REST API Client
-
-  /**
-   * Fetch all records from the app
-   * @return {Promise} - Returns a promise with all records
-   */
-  function fetchAllRecords() {
-    var query = ''; // Define any query conditions here if needed
-    return client.record.getAllRecords({ app: APP_ID, query: query });
-  }
+  // Constants for your app setup
+  const APP_ID = 4; // Your app ID
+  const SOURCE_VIEW_ID = 20; // View ID to fetch data from
+  const TARGET_VIEW_ID = 9311; // View ID to display data
+  const client = new KintoneRestAPIClient(); // Initialize Kintone REST API client
 
   /**
-   * Populate data into the custom view
-   * @param {Array} records - Records fetched from Kintone
+   * Fetch records from View ID 20
+   * @returns {Promise<Array>} - Array of fetched records
    */
-  function populateCustomView(records) {
-    var container = document.getElementById('custom-view-container');
-    if (!container) return;
-
-    // Clear existing content
-    container.innerHTML = '';
-
-    // Build table structure
-    var table = document.createElement('table');
-    table.style.width = '100%';
-    table.style.borderCollapse = 'collapse';
-
-    // Add table header
-    var headerRow = document.createElement('tr');
-    var headers = [
-      'Record Number',
-      'Scaffold Dimensions',
-      'Length (ft)',
-      'Width (ft)',
-      'Height (ft)',
-      'Number of Decks',
-      'Scaffold Model',
-      'Material List',
-      'Man Hours',
-      'Crew Size',
-    ];
-
-    headers.forEach(function (header) {
-      var th = document.createElement('th');
-      th.textContent = header;
-      th.style.border = '1px solid #ccc';
-      th.style.padding = '8px';
-      th.style.backgroundColor = '#f4f4f4';
-      th.style.textAlign = 'left';
-      table.appendChild(headerRow);
-      headerRow.appendChild(th);
-    });
-
-    // Add data rows
-    records.forEach(function (record) {
-      var row = document.createElement('tr');
-      var fields = [
-        record['Record number'].value,
-        record['Scaffold Dimensions'].value,
-        record['Length (ft)'].value,
-        record['Width (ft)'].value,
-        record['Height (ft)'].value,
-        record['Number of Decks'].value,
-        record['Scaffold Model'].value,
-        record['Material List'].value,
-        record['Man Hours'].value,
-        record['Crew Size'].value,
-      ];
-
-      fields.forEach(function (field) {
-        var td = document.createElement('td');
-        td.textContent = field || '-';
-        td.style.border = '1px solid #ccc';
-        td.style.padding = '8px';
-        row.appendChild(td);
+  const fetchRecordsFromView = async () => {
+    try {
+      // Use the Kintone REST API to get records from the source view
+      const response = await client.record.getRecords({
+        app: APP_ID,
+        query: `viewId = ${SOURCE_VIEW_ID}`, // Filter records by View ID 20
       });
-
-      table.appendChild(row);
-    });
-
-    container.appendChild(table);
-  }
+      return response.records;
+    } catch (error) {
+      console.error('Error fetching records:', error);
+      throw new Error('Failed to fetch records. Please check the view ID or API settings.');
+    }
+  };
 
   /**
-   * Event handler for app.record.index.show
-   * @param {Object} event - kintone event object
+   * Generate HTML for the table
+   * @param {Array} records - Array of records fetched from Kintone
+   * @returns {string} - HTML string for the table
    */
-  function indexShowHandler(event) {
-    if (event.viewId !== CUSTOM_VIEW_ID) {
-      return event; // Exit if not the custom view
+  const generateTableHTML = (records) => {
+    if (!records.length) {
+      return '<p>No data found for this view.</p>';
     }
 
-    // Fetch records and populate the custom view
-    fetchAllRecords()
-      .then(function (records) {
-        populateCustomView(records);
+    // Construct table header
+    const tableHeader = `
+      <thead>
+        <tr>
+          <th>Record Number</th>
+          <th>Scaffold Dimensions</th>
+          <th>Other Fields</th>
+        </tr>
+      </thead>
+    `;
+
+    // Construct table body
+    const tableBody = records
+      .map((record) => {
+        // Dynamically populate fields for each record
+        const otherFields = Object.keys(record)
+          .filter((key) => key !== 'Record_number' && key !== 'Scaffold_Dimensions')
+          .map((key) => `<strong>${key}</strong>: ${record[key].value || 'N/A'}`)
+          .join('<br>');
+
+        return `
+          <tr>
+            <td>${record.Record_number.value || 'N/A'}</td>
+            <td>${record.Scaffold_Dimensions.value || 'N/A'}</td>
+            <td>${otherFields}</td>
+          </tr>
+        `;
       })
-      .catch(function (error) {
-        console.error('Error fetching records:', error);
-      });
+      .join('');
 
+    return `
+      <table class="modern-table">
+        ${tableHeader}
+        <tbody>
+          ${tableBody}
+        </tbody>
+      </table>
+    `;
+  };
+
+  /**
+   * Render table in the target view (View ID 9311)
+   */
+  const renderTable = async () => {
+    const container = document.getElementById('container');
+    if (!container) {
+      console.error('Container element not found.');
+      return;
+    }
+
+    try {
+      const records = await fetchRecordsFromView(); // Fetch records
+      container.innerHTML = generateTableHTML(records); // Insert table HTML
+    } catch (error) {
+      container.innerHTML = '<p>Error loading data. Please try again later.</p>';
+    }
+  };
+
+  /**
+   * Kintone event handler for custom view rendering
+   * @param {Object} event - Kintone event object
+   * @returns {Object} - Event object
+   */
+  const customViewHandler = (event) => {
+    if (event.viewId === TARGET_VIEW_ID) {
+      renderTable(); // Render table when the target view is shown
+    }
     return event;
-  }
+  };
 
-  // Attach event handler to app.record.index.show
-  kintone.events.on('app.record.index.show', indexShowHandler);
+  // Attach event listener
+  kintone.events.on('app.record.index.show', customViewHandler);
 })();
